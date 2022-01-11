@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from '../role/role.entity';
 import { RoleRepository } from './role.repository';
+import { status } from '../../shared/entity-status.enum';
 
 @Injectable()
 export class RoleService {
@@ -17,7 +18,7 @@ export class RoleService {
             throw new BadRequestException('id must be sent');
         }
 
-        const role: Role = await this._roleRepository.findOne(id, {where: {status: 'ACTIVE'}});
+        const role: Role = await this._roleRepository.findOne(id, {where: {status: status.ACTIVE}});
         
         if (!role) {
             throw new NotFoundException();
@@ -27,7 +28,7 @@ export class RoleService {
     }
     
     async getAll(): Promise<Role[]> {
-        const roles: Role[] = await this._roleRepository.find({where: {status: 'ACTIVE'}});
+        const roles: Role[] = await this._roleRepository.find({where: {status: status.ACTIVE}});
         return roles;
     }
 
@@ -42,12 +43,12 @@ export class RoleService {
 
     async delete(id: number): Promise<void> {
         
-        const roleExists: Role = await this._roleRepository.findOne(id, {where: {status: 'ACTIVE'}});
+        const roleExists: Role = await this._roleRepository.findOne(id, {where: {status: status.ACTIVE}});
         
         if (!roleExists) {
             throw new NotFoundException();
         }
 
-        await this._roleRepository.update(id, {status: 'INACTIVE'});
+        await this._roleRepository.update(id, {status: status.INACTIVE});
     }
 }

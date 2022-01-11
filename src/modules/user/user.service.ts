@@ -7,6 +7,7 @@ import { UserDetails } from './user.details.entity';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { status } from '../../shared/entity-status.enum';
+import { RoleType } from '../role/role.enum';
 
 @Injectable()
 export class UserService {
@@ -42,7 +43,7 @@ export class UserService {
         const details = new UserDetails();
         user.details = details;
         const repo = await getConnection().getRepository(Role);
-        const defaultRole = await repo.findOne({where: {name: 'GENERAL'}});
+        const defaultRole = await repo.findOne({where: {name: RoleType.GENERAL}});
         user.roles = [defaultRole];
         
         const savedUser = await this._userRepository.save(user);
