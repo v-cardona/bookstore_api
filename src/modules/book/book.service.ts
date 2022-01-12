@@ -43,20 +43,14 @@ export class BookService {
 
     async getBooksByAuthor(authorId: number): Promise<ReadBookDto []> {
         if (!authorId) {
-            throw new BadRequestException('author id muest be sent');
+            throw new BadRequestException('author id must be sent');
         }
         const books: Book[] = await this._bookRepository
-
-        .createQueryBuilder('books')
-  
-        .leftJoinAndSelect('books.authors', 'users')
-  
-        .where('books.status = :status', { status: 'ACTIVE' })
-  
-        .andWhere('users.id = :id ', { id: authorId })
-  
-        .getMany();
-  
+          .createQueryBuilder('books')
+          .leftJoinAndSelect('books.authors', 'users')
+          .where('books.status = :status', { status: status.ACTIVE })
+          .andWhere('users.id = :id ', { id: authorId })
+          .getMany();
 
         return books.map((book) => plainToClass(ReadBookDto, book));
     } 
@@ -135,7 +129,7 @@ export class BookService {
     return plainToClass(ReadBookDto, updatedBook);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<boolean> {
     const bookExists = await this._bookRepository.findOne(id, {
       where: { status: status.ACTIVE },
     });
@@ -145,6 +139,7 @@ export class BookService {
     }
 
     await this._bookRepository.update(id, { status: status.INACTIVE });
+    return true;
   }
 
 }
