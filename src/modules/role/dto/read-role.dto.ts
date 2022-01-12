@@ -1,5 +1,7 @@
 import { Exclude, Expose } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+
 
 @Exclude()
 export class ReadRoleDto {
@@ -10,12 +12,14 @@ export class ReadRoleDto {
     @Expose()
     @IsNotEmpty()
     @IsString()
-    @MaxLength(50, {message: 'this name is not valid'})
+    @MaxLength(50)
+    @ApiProperty({example: 'GENERAL'})
     readonly name: string;
 
     @Expose()
     @IsNotEmpty()
     @IsString()
-    @MaxLength(100, {message: 'this description is not valid'})
+    @MaxLength(100)
+    @ApiProperty({example: 'GENERAL description'})
     readonly description: string
 }

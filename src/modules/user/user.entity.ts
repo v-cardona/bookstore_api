@@ -24,10 +24,16 @@ export class User extends BaseEntity {
 
     @ManyToMany(type => Role, role => role.users, {eager: true})
     @JoinTable({name: 'user_roles'})
+    /**
+     * List of user's roles
+     */
     roles: Role[];
     
     @ManyToMany(type => Book, book => book.authors, )
     @JoinTable({name: 'user_books'})
+    /**
+     * List of books that the user is author
+     */
     books: Book[];
 
     @Column({type: 'varchar', default: status.ACTIVE, length: 8})

@@ -1,7 +1,4 @@
-import { IsEmail } from "class-validator";
+import { PickType } from '@nestjs/swagger';
+import { ReadUserDto } from ".";
 
-export class UpdateUserDto {
-    
-    @IsEmail()
-    readonly username: string;
-}
+export class UpdateUserDto extends PickType(ReadUserDto, ['username'] as const) {}

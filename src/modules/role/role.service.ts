@@ -12,9 +12,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 export class RoleService {
     constructor(
         @InjectRepository(RoleRepository)
-        private readonly _roleRepository: RoleRepository) {
-
-    }
+        private readonly _roleRepository: RoleRepository) {}
 
     
     async get(id: number): Promise<ReadRoleDto> {
@@ -36,12 +34,12 @@ export class RoleService {
         return roles.map((role) => plainToClass(ReadRoleDto, role));
     }
 
-    async create(role: Partial<CreateRoleDto>): Promise<ReadRoleDto> {
+    async create(role: CreateRoleDto): Promise<ReadRoleDto> {
         const savedRole = await this._roleRepository.save(role);
         return plainToClass(ReadRoleDto, savedRole);
     }
 
-    async update(id: number, role: Partial<UpdateRoleDto>): Promise<ReadRoleDto> {
+    async update(id: number, role: UpdateRoleDto): Promise<ReadRoleDto> {
         const foundRole: Role = await this._roleRepository.findOne(id, {where: {status: status.ACTIVE}});
 
         if (!foundRole) {

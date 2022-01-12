@@ -6,6 +6,9 @@ import { Type, Exclude, Expose } from 'class-transformer';
 export class LoggedInDto {
   @Expose()
   @IsString()
+  /**
+   * Token that will be use on header request
+   */
   token: string;
 
   @Expose()

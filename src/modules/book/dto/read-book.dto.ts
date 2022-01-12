@@ -1,6 +1,8 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsString, IsNumber, MaxLength } from 'class-validator';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { ReadUserDto } from '../../user/dto';
+import { ApiProperty } from '@nestjs/swagger';
+
 
 @Exclude()
 export class ReadBookDto {
@@ -10,10 +12,14 @@ export class ReadBookDto {
 
   @Expose()
   @IsString()
+  @MaxLength(100)
+  @ApiProperty({example: 'NestJs for Dummies'})
   readonly name: string;
 
   @Expose()
   @IsString()
+  @MaxLength(500)
+  @ApiProperty({example: 'NestJs for Dummies description'})
   readonly description: string;
 
   @Expose()

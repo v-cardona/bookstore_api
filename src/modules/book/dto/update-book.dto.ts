@@ -1,9 +1,4 @@
-import { IsString } from 'class-validator';
+import { CreateBookDto } from '.';
+import { OmitType } from '@nestjs/swagger';
 
-export class UpdateBookDto {
-  @IsString()
-  readonly name: string;
-
-  @IsString()
-  readonly description: string;
-}
+export class UpdateBookDto extends OmitType(CreateBookDto, ['authors'] as const){}

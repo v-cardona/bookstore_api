@@ -1,33 +1,63 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { CreateRoleDto, ReadRoleDto, UpdateRoleDto } from './dto/index.dto';
 import { RoleService } from './role.service';
 
 @Controller('roles')
+@ApiTags('Roles')
 export class RoleController {
     constructor(private readonly _roleService: RoleService) {}
 
-    @Get(':id')
-    getRole(@Param('id', ParseIntPipe) id: number): Promise<ReadRoleDto> {
-        return this._roleService.get(id);
+    /**
+     * Get role by id
+     * @param roleId 
+     * @returns [ReadRoleDto]
+     */
+    @Get(':roleId')
+    @ApiBadRequestResponse({description: '[roleId] is not sent'})
+    getRole(@Param('roleId', ParseIntPipe) roleId: number): Promise<ReadRoleDto> {
+        return this._roleService.get(roleId);
     }
     
+    /**
+     * Get all roles
+     * @returns [ReadRoleDto[]]
+     */
     @Get()
     getRoles(): Promise<ReadRoleDto []> {
         return this._roleService.getAll();
     }
 
+    /**
+     * Create a role
+     * @param role 
+     * @returns The [ReadRoleDto] created
+     */
     @Post()
-    createRole(@Body() role: Partial<CreateRoleDto>):  Promise<ReadRoleDto> {
+    createRole(@Body() role: CreateRoleDto):  Promise<ReadRoleDto> {
         return this._roleService.create(role);
     }
 
-    @Patch(':id')
-    updateRole(@Param('id', ParseIntPipe) id: number, @Body() role: Partial<UpdateRoleDto>):  Promise<ReadRoleDto> {
-        return this._roleService.update(id, role);
+    /**
+     * Updates a role
+     * @param roleId 
+     * @param role 
+     * @returns The [ReadRoleDto] updated
+     */
+    @Patch(':roleId')
+    @ApiNotFoundResponse({description: 'The role with that [roleId] does not exist'})
+    updateRole(@Param('roleId', ParseIntPipe) roleId: number, @Body() role: UpdateRoleDto):  Promise<ReadRoleDto> {
+        return this._roleService.update(roleId, role);
     }
 
-    @Delete(':id')
-    deleteRole(@Param('id', ParseIntPipe) id: number):  Promise<boolean> {
-        return this._roleService.delete(id);
+    /**
+     * Deletes the role by [roleId]
+     * @param roleId 
+     * @returns [true] if deleted
+     */
+    @Delete(':roleId')
+    @ApiNotFoundResponse({description: 'The role with that [roleId] does not exist'})
+    deleteRole(@Param('roleId', ParseIntPipe) roleId: number):  Promise<boolean> {
+        return this._roleService.delete(roleId);
     }
 }

@@ -8,13 +8,23 @@ export class Book extends BaseEntity {
     id: number;
 
     @Column({type: 'varchar', length: 100, nullable: false})
+    /**
+     * Title of the book
+     * @example The Lord of the Rings
+     */
     name: string;
 
     @Column({type: 'varchar', length: 500,})
+    /**
+     * Description of the book
+     */
     description: string;
 
     @ManyToMany(type => User, user => user.books, {eager: true})
     @JoinColumn()
+    /**
+     * List of users with role author
+     */
     authors: User[]
     
     @Column({type: 'varchar', default: status.ACTIVE, length: 8})

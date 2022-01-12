@@ -6,7 +6,6 @@ import { status} from '../../shared/entity-status.enum';
 import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dto';
 import { plainToClass } from 'class-transformer';
 import { Book } from './book.entity';
-import { In } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Role } from '../role/role.entity';
 import { RoleType } from '../role/role.enum';
@@ -112,7 +111,7 @@ export class BookService {
   }
   async update(
     bookId: number,
-    book: Partial<UpdateBookDto>,
+    book: UpdateBookDto,
   ): Promise<ReadBookDto> {
     const bookExists = await this._bookRepository.findOne(bookId, {
       where: { status: status.ACTIVE },
