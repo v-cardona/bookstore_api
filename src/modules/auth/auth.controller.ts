@@ -1,9 +1,10 @@
 import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { VersioningEnum } from 'src/shared/versioning.enum';
 import { AuthService } from './auth.service';
 import { LoggedInDto, SigninDto, SignupDto } from './dto';
 
-@Controller('auth')
+@Controller({path: 'auth', version: VersioningEnum.V1})
 @ApiTags('Authentication')
 export class AuthController {
 

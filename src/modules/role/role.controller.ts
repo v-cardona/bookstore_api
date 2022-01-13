@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Version } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { VersioningEnum } from 'src/shared/versioning.enum';
 import { CreateRoleDto, ReadRoleDto, UpdateRoleDto } from './dto/index.dto';
 import { RoleService } from './role.service';
 
-@Controller('roles')
+@Controller({path: 'roles', version: VersioningEnum.V1})
 @ApiTags('Roles')
 export class RoleController {
     constructor(private readonly _roleService: RoleService) {}
@@ -45,6 +46,7 @@ export class RoleController {
      * @returns The [ReadRoleDto] updated
      */
     @Patch(':roleId')
+    @Version(VersioningEnum.V2)
     @ApiNotFoundResponse({description: 'The role with that [roleId] does not exist'})
     updateRole(@Param('roleId', ParseIntPipe) roleId: number, @Body() role: UpdateRoleDto):  Promise<ReadRoleDto> {
         return this._roleService.update(roleId, role);

@@ -1,14 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, Version } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiHeader, ApiUnauthorizedResponse, ApiNotFoundResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/decorators/role.decorator';
 import { RoleGuard } from '../role/guards/role.guard';
 import { RoleType } from '../role/role.enum';
 import { ReadUserDto, UpdateUserDto } from './dto';
-import { User } from './user.entity';
 import { UserService } from './user.service';
+import { VersioningEnum } from 'src/shared/versioning.enum';
 
-@Controller('users')
+@Controller({path: 'users', version: VersioningEnum.V1})
 @ApiTags('Users')
 @ApiBearerAuth()
 @ApiHeader({
@@ -49,6 +49,7 @@ export class UserController {
      * @returns The [ReadUserDto] updated
      */
     @Patch(':userId')
+    @Version(VersioningEnum.V2)
     @ApiNotFoundResponse({description: 'The user with [userId] does not exist'})
     updateUser(@Param('userId', ParseIntPipe) userId: number, @Body() user: UpdateUserDto):  Promise<ReadUserDto> {
         return this._userService.update(userId, user);

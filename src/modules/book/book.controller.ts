@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Version } from '@nestjs/common';
 import { Roles } from '../role/decorators/role.decorator';
 import { RoleType } from '../role/role.enum';
 import { BookService } from './book.service';
 import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dto';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiTags } from '@nestjs/swagger';
+import { VersioningEnum } from 'src/shared/versioning.enum';
 
-@Controller('book')
+@Controller({version: VersioningEnum.V1, path: 'book'})
 @ApiTags('Books')
 export class BookController {
   constructor(private readonly _bookService: BookService) {}
@@ -62,6 +63,7 @@ export class BookController {
    * @returns 
    */
   @Patch(':bookId')
+  @Version(VersioningEnum.V2)
   @ApiNotFoundResponse({description: 'The book with bookId does not exist'})
   updateBook(
     @Param('bookId', ParseIntPipe) bookId: number,
