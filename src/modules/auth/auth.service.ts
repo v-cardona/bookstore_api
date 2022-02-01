@@ -9,6 +9,9 @@ import { status } from '../../shared/entity-status.enum';
 import { AuthRepository } from './auth.repository';
 import { LoggedInDto, SigninDto, SignupDto } from './dto';
 import { IJwtPayload } from './jwt-payload.interface';
+import { CredentialsInUse } from './exception/credentialsInUse.exception';
+import { UserNotFoundException } from '../user/exception/userNotFound.exception';
+import { WrongCredentials } from './exception/wrongCredentials.exception ';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +28,7 @@ export class AuthService {
         const userExists = await this._authRepository.findOne({where: [{username}, {email}]});
 
         if (userExists) {
-            throw new ConflictException('username or email already exists');
+            throw new CredentialsInUse();
         }
 
         return this._authRepository.signup(signupDto);
@@ -36,13 +39,13 @@ export class AuthService {
         const user: User = await this._authRepository.findOne({where: {username, status: status.ACTIVE}});
 
         if (!user) {
-            throw new NotFoundException('user does not exist');
+            throw new WrongCredentials();
         }
 
         const isMatch = await compare(password, user.password);
 
         if (!isMatch) {
-            throw new UnauthorizedException('invalid credentials');
+            throw new WrongCredentials();
         }
 
         const payload: IJwtPayload = {

@@ -7,6 +7,8 @@ import { UserRepository } from './user.repository';
 import { status } from '../../shared/entity-status.enum';
 import { ReadUserDto, UpdateUserDto } from './dto';
 import { plainToClass } from 'class-transformer';
+import { IdMissingException } from 'src/shared/exception/idMissing.exception';
+import { RoleNotFoundException } from '../role/exception/RoleNotFound.exception';
 
 @Injectable()
 export class UserService {
@@ -21,7 +23,7 @@ export class UserService {
     
     async get(id: number): Promise<ReadUserDto> {
         if (!id) {
-            throw new BadRequestException('id must be sent');
+            throw new IdMissingException();
         }
 
         const user: User = await this._userRepository.findOne(id, {where: {status: status.ACTIVE}});
@@ -75,7 +77,7 @@ export class UserService {
         const roleExists: Role = await this._roleRepository.findOne(roleId, {where: {status: status.ACTIVE}});
         
         if (!roleExists) {
-            throw new NotFoundException('Role does not exist');
+            throw new RoleNotFoundException(roleId);
         }
 
         userExists.roles.push(roleExists);

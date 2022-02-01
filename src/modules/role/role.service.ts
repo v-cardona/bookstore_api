@@ -7,6 +7,8 @@ import { ReadRoleDto } from './dto/read-role.dto';
 import { plainToClass } from 'class-transformer';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { RoleNotFoundException } from './exception/RoleNotFound.exception';
+import { IdMissingException } from 'src/shared/exception/idMissing.exception';
 
 @Injectable()
 export class RoleService {
@@ -17,7 +19,7 @@ export class RoleService {
     
     async get(id: number): Promise<ReadRoleDto> {
         if (!id) {
-            throw new BadRequestException('id must be sent');
+            throw new IdMissingException();
         }
 
         const role: Role = await this._roleRepository.findOne(id, {where: {status: status.ACTIVE}});
@@ -43,7 +45,7 @@ export class RoleService {
         const foundRole: Role = await this._roleRepository.findOne(id, {where: {status: status.ACTIVE}});
 
         if (!foundRole) {
-            throw new NotFoundException('This role does not exist');
+            throw new RoleNotFoundException(id);
         }
 
         foundRole.name = role.name;

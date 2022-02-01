@@ -9,6 +9,10 @@ import { Book } from './book.entity';
 import { User } from '../user/user.entity';
 import { Role } from '../role/role.entity';
 import { RoleType } from '../role/role.enum';
+import {BookNotFoundException} from './exception/bookNotFound.exception';
+import { UserIsNotAuthorException } from '../user/exception/userIsNotAuthor.exception';
+import { UserNotFoundException } from '../user/exception/userNotFound.exception';
+import { IdMissingException } from 'src/shared/exception/idMissing.exception';
 
 @Injectable()
 export class BookService {
@@ -29,7 +33,7 @@ export class BookService {
         const book: Book = await this._bookRepository.findOne(bookId, {where: {status: status.ACTIVE}})
     
         if (!book) {
-            throw new NotFoundException();
+            throw new BookNotFoundException(bookId);
         }
 
         return plainToClass(ReadBookDto, book);
@@ -42,7 +46,7 @@ export class BookService {
 
     async getBooksByAuthor(authorId: number): Promise<ReadBookDto []> {
         if (!authorId) {
-            throw new BadRequestException('author id must be sent');
+            throw new IdMissingException();
         }
         const books: Book[] = await this._bookRepository
           .createQueryBuilder('books')
@@ -63,9 +67,7 @@ export class BookService {
       });
 
       if (!authorExists) {
-        throw new NotFoundException(
-          `There's not an author with this Id: ${authorId}`,
-        );
+        throw new UserNotFoundException(authorId);
       }
 
       const isAuthor = authorExists.roles.some(
@@ -73,7 +75,7 @@ export class BookService {
       );
 
       if (!isAuthor) {
-        throw new ConflictException(`This user ${authorId} is not an author`);
+        throw new UserIsNotAuthorException(authorId);
       }
 
       authors.push(authorExists);
@@ -98,7 +100,7 @@ export class BookService {
     );
 
     if (!isAuthor) {
-      throw new ConflictException(`This user ${authorId} is not an author`);
+      throw new UserIsNotAuthorException(authorId);
     }
 
     const savedBook: Book = await this._bookRepository.save({
@@ -118,7 +120,7 @@ export class BookService {
     });
 
     if (!bookExists) {
-      throw new NotFoundException('This book does not exists');
+      throw new BookNotFoundException(bookId);
     }
 
     bookExists.name = book.name;
@@ -134,7 +136,7 @@ export class BookService {
     });
 
     if (!bookExists) {
-      throw new NotFoundException('This book does not exists');
+      throw new BookNotFoundException(id);
     }
 
     await this._bookRepository.update(id, { status: status.INACTIVE });
