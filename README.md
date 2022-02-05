@@ -20,6 +20,7 @@ $ git clone https://github.com/v-cardona/bookstore_api.git
 - run `npm install`
 - create a docker container with postgres image `docker run -d -p DOCKER_PORT:5432 --name bookstore_container -e POSTGRES_PASSWORD=password postgres`
 - set up your postgres database
+- create a firebase project and a storage bucket
 - rename `.env.sample` to `.env` and populate the parameters
 - rename `.orm.config.json.sample` to `.orm.config.json` and populate the parameters
 - run databse migration `npm run migration:run`
