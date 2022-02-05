@@ -101,7 +101,7 @@ export class UserController {
      */
     @Delete('avatar/:userId')
     @ApiNotFoundResponse({description: 'The user with [userId] does not exist'})
-    async deleteAvatar(@Param('userId', ParseIntPipe) userId: number) {
+    async deleteAvatar(@Param('userId', ParseIntPipe) userId: number): Promise<boolean> {
         return this._userService.deleteAvatar(userId);
     }
     

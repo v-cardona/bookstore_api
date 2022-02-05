@@ -1,6 +1,7 @@
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes, uploadString } from '@firebase/storage';
 import { Injectable, UploadedFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { QueryRunner } from 'typeorm';
 import { PublicFile } from './publicFile.entity';
 import { PublicFileRepository } from './publicFile.repository';
 
@@ -95,6 +96,41 @@ export class FilesService {
       try {
         deleteObject(desertRef);
         await this._publicFilesRepository.delete(fileId);
+        return true;
+      } catch (error) {
+        
+        switch (error.code) {
+          case 'storage/object-not-found':
+            // File doesn't exist
+            break;
+          case 'storage/unauthorized':
+            // User doesn't have permission to access the object
+            break;
+          case 'storage/canceled':
+            // User canceled the upload
+            break;
+    
+          // ...
+    
+          case 'storage/unknown':
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      }
+    }
+
+    async deletePublicFileWithQueryRunner(fileId: number, queryRunner: QueryRunner) {
+      const file = await queryRunner.manager.findOne(PublicFile, { id: fileId });
+      
+      const storage = getStorage();
+
+      // Create a reference to the file to delete
+      const desertRef = ref(storage, file.key);
+
+      // Delete the file
+      try {
+        deleteObject(desertRef);
+        await queryRunner.manager.delete(PublicFile, fileId);
         return true;
       } catch (error) {
         
