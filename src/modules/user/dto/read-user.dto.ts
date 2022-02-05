@@ -3,6 +3,7 @@ import { IsEmail, IsNumber, MaxLength } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
 import { ReadUserDetailsDto } from "./index";
 import { ReadRoleDto } from "../../role/dto/index.dto";
+import { ReadPublicFilerDto } from "src/modules/files/dto/read-public-file.dto";
 
 @Exclude()
 export class ReadUserDto {
@@ -29,4 +30,9 @@ export class ReadUserDto {
     @Expose()
     @Type(type => ReadRoleDto)
     readonly roles: ReadRoleDto
+    
+    @Expose()
+    @Type(type => ReadPublicFilerDto)
+    @ApiProperty({type: ReadPublicFilerDto})
+    readonly avatar: ReadPublicFilerDto
 }

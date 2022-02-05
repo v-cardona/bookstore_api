@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from '../role/role.entity';
 import { RoleRepository } from '../role/role.repository';
@@ -9,6 +9,12 @@ import { ReadUserDto, UpdateUserDto } from './dto';
 import { plainToClass } from 'class-transformer';
 import { IdMissingException } from 'src/shared/exception/idMissing.exception';
 import { RoleNotFoundException } from '../role/exception/RoleNotFound.exception';
+import { FilesService } from '../files/files.service';
+import { UserNotFoundException } from './exception/userNotFound.exception';
+import { PublicFile } from '../files/publicFile.entity';
+import { ReadPublicFilerDto } from '../files/dto/read-public-file.dto';
+import { v4 as uuid } from 'uuid';
+import { FilesDirectoriesStorage } from '../files/filesDirectories.constant';
 
 @Injectable()
 export class UserService {
@@ -16,7 +22,8 @@ export class UserService {
         @InjectRepository(UserRepository)
         private readonly _userRepository: UserRepository,
         @InjectRepository(RoleRepository)
-        private readonly _roleRepository: RoleRepository,) {
+        private readonly _roleRepository: RoleRepository,
+        private readonly _filesService: FilesService) {
 
     }
 
@@ -71,7 +78,7 @@ export class UserService {
         const userExists: User = await this._userRepository.findOne(userId, {where: {status: status.ACTIVE}});
         
         if (!userExists) {
-            throw new NotFoundException();
+            throw new UserNotFoundException(userId);
         }
         
         const roleExists: Role = await this._roleRepository.findOne(roleId, {where: {status: status.ACTIVE}});
@@ -84,5 +91,44 @@ export class UserService {
         await this._userRepository.save(userExists);
 
         return true;
+    }
+
+    async getById(userId: number): Promise<User> {
+        const user: User = await this._userRepository.findOne(userId, {where: {status: status.ACTIVE}});
+        
+        if (!user) {
+            throw new UserNotFoundException(userId);
+        }
+
+        return user;
+    }
+     
+    async addAvatar(userId: number, imageBuffer: Buffer, filename: string): Promise<ReadPublicFilerDto> {
+        // TODO: comprobar el tamaño de imagen o comprimir
+        const user = await this.getById(userId);
+        if (user.avatar) {
+            await this.deleteUserAvatar(user);
+        }
+        const filenameUnique: string = `${FilesDirectoriesStorage.AVATARS}/${uuid()}-${filename}`;
+        const avatar = await this._filesService.uploadPublicFile(imageBuffer, filenameUnique);
+        await this._userRepository.update(userId, {
+            avatar
+        });
+        return plainToClass(ReadPublicFilerDto, avatar);
+    }
+
+    async deleteAvatar(userId: number) {
+        const user = await this.getById(userId);
+        return await this.deleteUserAvatar(user);
+    }
+    async deleteUserAvatar(user: User): Promise<boolean> {
+        const fileId = user.avatar?.id;
+        if (fileId) {
+            await this._userRepository.update( user.id, {
+                avatar: null
+            });
+            return await this._filesService.deletePublicFile(fileId);
+        }
+        return false;
     }
 }

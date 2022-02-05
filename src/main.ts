@@ -2,6 +2,7 @@ import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerCustomOptions, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { initializeApp } from "@firebase/app";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +31,14 @@ async function bootstrap() {
   };
   
   SwaggerModule.setup('docs', app, document, customOptions);
+  
+  // init firebase
+  const firebaseConfig = {
+    apiKey: AppModule.firebasePrivateKey,
+    storageBucket: AppModule.firebaseStorageBucket
+  };
+  initializeApp(firebaseConfig);
+
   
   await app.listen(AppModule.port);
 }

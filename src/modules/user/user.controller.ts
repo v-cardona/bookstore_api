@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, Version } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UploadedFile, UseGuards, UseInterceptors, Version } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiHeader, ApiUnauthorizedResponse, ApiNotFoundResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/decorators/role.decorator';
@@ -7,6 +7,9 @@ import { RoleType } from '../role/role.enum';
 import { ReadUserDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 import { VersioningEnum } from 'src/shared/versioning.enum';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { PublicFile } from '../files/publicFile.entity';
+import { ReadPublicFilerDto } from '../files/dto/read-public-file.dto';
 
 @Controller({path: 'users', version: VersioningEnum.V1})
 @ApiTags('Users')
@@ -77,4 +80,29 @@ export class UserController {
     setRoleToUser(@Param('userId', ParseIntPipe) userId: number, @Param('roleId', ParseIntPipe) roleId: number):  Promise<boolean> {
         return this._userService.setRoleToUser(userId, roleId);
     }
+
+    /**
+     * Upload a avatar to the [userId]
+     * @param userId 
+     * @param file 
+     * @returns [ReadPublicFilerDto] url of the download file
+     */
+    @Post('avatar/:userId')
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiNotFoundResponse({description: 'The user with [userId] does not exist'})
+    async addAvatar(@Param('userId', ParseIntPipe) userId: number, @UploadedFile() file: Express.Multer.File): Promise<ReadPublicFilerDto> {
+        return this._userService.addAvatar(userId, file.buffer, file.originalname);
+    }
+
+    /**
+     * Delete the user's avatar 
+     * @param userId 
+     * @returns [true] if deleted successfully
+     */
+    @Delete('avatar/:userId')
+    @ApiNotFoundResponse({description: 'The user with [userId] does not exist'})
+    async deleteAvatar(@Param('userId', ParseIntPipe) userId: number) {
+        return this._userService.deleteAvatar(userId);
+    }
+    
 }
