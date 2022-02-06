@@ -34,7 +34,6 @@ async function bootstrap() {
   
   // init firebase
   const firebaseConfig = {
-    apiKey: AppModule.firebasePrivateKey,
     storageBucket: AppModule.firebaseStorageBucket
   };
   initializeApp(firebaseConfig);

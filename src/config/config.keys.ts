@@ -6,5 +6,4 @@ export enum Configuration {
     DATABASE = 'DATABASE',
     JWT_SECRET = 'JWT_SECRET',
     STORAGE_BUCKET = 'STORAGE_BUCKET',
-    PRIVATE_KEY_ID = 'PRIVATE_KEY_ID',
 }
