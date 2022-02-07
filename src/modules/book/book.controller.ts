@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Version } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Version } from '@nestjs/common';
 import { Roles } from '../role/decorators/role.decorator';
 import { RoleType } from '../role/role.enum';
 import { BookService } from './book.service';
 import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dto';
-import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { VersioningEnum } from 'src/shared/versioning.enum';
 
 @Controller({version: VersioningEnum.V1, path: 'book'})
@@ -34,12 +34,19 @@ export class BookController {
   }
 
   /**
-   * Get all books
+   * Get all books or filter by name contains the search
    * @returns [ReadBookDto[]]
    */
   @Get()
-  getAllBooks(): Promise<ReadBookDto[]> {
-    return this._bookService.getAll();
+  @ApiQuery({
+    name: 'search',
+    required: false
+  })
+  getAllBooks(@Query('search') search: string) {
+    if (search) {
+      return this._bookService.searchForBooks(search);
+    }
+    //return this._bookService.getAll();
   }
 
   /**

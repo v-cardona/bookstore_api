@@ -13,6 +13,7 @@ import {BookNotFoundException} from './exception/bookNotFound.exception';
 import { UserIsNotAuthorException } from '../user/exception/userIsNotAuthor.exception';
 import { UserNotFoundException } from '../user/exception/userNotFound.exception';
 import { IdMissingException } from 'src/shared/exception/idMissing.exception';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export class BookService {
@@ -21,6 +22,7 @@ export class BookService {
         private readonly _bookRepository: BookRepository,
         @InjectRepository(UserRepository)
         private readonly _userRepository: UserRepository,
+        private connection: Connection,
     ) {
         
     }
@@ -141,6 +143,16 @@ export class BookService {
 
     await this._bookRepository.update(id, { status: status.INACTIVE });
     return true;
+  }
+
+  async searchForBooks(text: string) {
+    
+    const result = await this._bookRepository.createQueryBuilder()
+      .select()
+      .where('name ILIKE :searchTerm', {searchTerm: `%${text}%`})
+      .andWhere('status = :status', {status: status.ACTIVE})
+      .getMany();
+    return result;
   }
 
 }
