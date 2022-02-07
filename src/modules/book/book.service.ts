@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from '../user/user.repository';
 import { BookRepository } from './book.repository';
 import { status} from '../../shared/entity-status.enum';
-import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dto';
+import { CreateBookDto, ReadBookDto, ReadBooksSearchResultDto, UpdateBookDto } from './dto';
 import { plainToClass } from 'class-transformer';
 import { Book } from './book.entity';
 import { User } from '../user/user.entity';
@@ -13,7 +13,7 @@ import {BookNotFoundException} from './exception/bookNotFound.exception';
 import { UserIsNotAuthorException } from '../user/exception/userIsNotAuthor.exception';
 import { UserNotFoundException } from '../user/exception/userNotFound.exception';
 import { IdMissingException } from 'src/shared/exception/idMissing.exception';
-import { Connection } from 'typeorm';
+import { Connection, FindManyOptions, MoreThan } from 'typeorm';
 
 @Injectable()
 export class BookService {
@@ -41,9 +41,26 @@ export class BookService {
         return plainToClass(ReadBookDto, book);
     }
 
-    async getAll(): Promise<ReadBookDto []> {
-        const books = await this._bookRepository.find({where: {status: status.ACTIVE}});
-        return books.map((book) => plainToClass(ReadBookDto, book));
+    async getAll(offset?: number, limit?: number): Promise<ReadBooksSearchResultDto> {
+      const where: FindManyOptions<Book>['where'] = {};
+      where.status = status.ACTIVE;
+    
+      const [items, total_results] = await this._bookRepository.findAndCount({
+        where,
+        order: {
+          id: 'ASC'
+        },
+        skip: offset,
+        take: limit
+      });
+      const books = items.map((book) => plainToClass(ReadBookDto, book));
+    
+      const result = {
+        total_results: total_results,
+        results: books
+      }
+
+      return plainToClass(ReadBooksSearchResultDto, result);
     }
 
     async getBooksByAuthor(authorId: number): Promise<ReadBookDto []> {
@@ -145,14 +162,22 @@ export class BookService {
     return true;
   }
 
-  async searchForBooks(text: string) {
+  async searchForBooks(text: string, offset?: number, limit?: number): Promise<ReadBooksSearchResultDto> {
     
-    const result = await this._bookRepository.createQueryBuilder()
+    const [ books, total_results] = await this._bookRepository.createQueryBuilder()
       .select()
       .where('name ILIKE :searchTerm', {searchTerm: `%${text}%`})
       .andWhere('status = :status', {status: status.ACTIVE})
-      .getMany();
-    return result;
+      .limit(limit)
+      .offset(offset)
+      .getManyAndCount();
+      
+      const result = {
+        total_results: total_results,
+        results: books
+      }
+
+      return plainToClass(ReadBooksSearchResultDto, result);
   }
 
 }

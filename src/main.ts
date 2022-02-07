@@ -1,4 +1,4 @@
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerCustomOptions, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -38,6 +38,11 @@ async function bootstrap() {
   };
   initializeApp(firebaseConfig);
 
+  app.useGlobalPipes(new ValidationPipe(
+    {
+      transform: true
+    }
+  ));
   
   await app.listen(AppModule.port);
 }

@@ -5,6 +5,7 @@ import { BookService } from './book.service';
 import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dto';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { VersioningEnum } from 'src/shared/versioning.enum';
+import { PaginationParams } from 'src/shared/paginationParams';
 
 @Controller({version: VersioningEnum.V1, path: 'book'})
 @ApiTags('Books')
@@ -40,13 +41,29 @@ export class BookController {
   @Get()
   @ApiQuery({
     name: 'search',
+    description: 'search on name of book',
     required: false
   })
-  getAllBooks(@Query('search') search: string) {
+  @ApiQuery({
+    name: 'limit',
+    description: 'max results to get, max: 40, defalt: 20',
+    required: false,
+    type: 'number',
+  })
+  @ApiQuery({
+    name: 'offset',
+    description: 'get books with starting on the selected offset',
+    required: false,
+    type: 'number',
+  })
+  getAllBooks(
+    @Query('search') search: string,
+    @Query() { offset, limit }: PaginationParams
+  ) {
     if (search) {
-      return this._bookService.searchForBooks(search);
+      return this._bookService.searchForBooks(search, offset, limit);
     }
-    //return this._bookService.getAll();
+    return this._bookService.getAll(offset, limit);
   }
 
   /**
