@@ -105,6 +105,15 @@ export class BookService {
         description: book.description,
         authors,
       });
+
+      // actualizar el libro para crear el tsvector
+      this._bookRepository.createQueryBuilder()
+      .update(Book)
+      .set({
+          description_vector: () => `to_tsvector('english', '${book.description}')`,
+        })
+        .where('id = :id', {id: savedBook.id})
+        .execute();
   
       return plainToClass(ReadBookDto, savedBook);
     }

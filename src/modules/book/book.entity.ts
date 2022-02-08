@@ -20,6 +20,13 @@ export class Book extends BaseEntity {
      */
     description: string;
 
+    
+    @Column({type: 'tsvector', select: false})
+    /**
+     * Description of the book
+     */
+    description_vector: string;
+
     @ManyToMany(type => User, user => user.books, {eager: true})
     @JoinColumn()
     /**
