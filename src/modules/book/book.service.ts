@@ -13,7 +13,7 @@ import {BookNotFoundException} from './exception/bookNotFound.exception';
 import { UserIsNotAuthorException } from '../user/exception/userIsNotAuthor.exception';
 import { UserNotFoundException } from '../user/exception/userNotFound.exception';
 import { IdMissingException } from 'src/shared/exception/idMissing.exception';
-import { Connection, FindManyOptions, MoreThan } from 'typeorm';
+import { Brackets, Connection, FindManyOptions, MoreThan } from 'typeorm';
 
 @Injectable()
 export class BookService {
@@ -175,8 +175,11 @@ export class BookService {
     
     const [ books, total_results] = await this._bookRepository.createQueryBuilder()
       .select()
-      .where('name ILIKE :searchTerm', {searchTerm: `%${text}%`})
-      .andWhere('status = :status', {status: status.ACTIVE})
+      .where('status = :status', {status: status.ACTIVE})
+      .andWhere(new Brackets(qb => {
+        qb.where('name ILIKE :searchName', {searchName: `%${text}%`}) // search on name
+        .orWhere(`to_tsvector(description) @@ to_tsquery(:searchDescription)`, {searchDescription: text}) // search on description
+      }))
       .limit(limit)
       .offset(offset)
       .getManyAndCount();

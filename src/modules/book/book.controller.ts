@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query,
 import { Roles } from '../role/decorators/role.decorator';
 import { RoleType } from '../role/role.enum';
 import { BookService } from './book.service';
-import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dto';
+import { CreateBookDto, ReadBookDto, ReadBooksSearchResultDto, UpdateBookDto } from './dto';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { VersioningEnum } from 'src/shared/versioning.enum';
 import { PaginationParams } from 'src/shared/paginationParams';
@@ -41,7 +41,7 @@ export class BookController {
   @Get()
   @ApiQuery({
     name: 'search',
-    description: 'search on name of book',
+    description: 'search on name and description of book',
     required: false
   })
   @ApiQuery({
@@ -59,7 +59,7 @@ export class BookController {
   getAllBooks(
     @Query('search') search: string,
     @Query() { offset, limit }: PaginationParams
-  ) {
+  ): Promise<ReadBooksSearchResultDto> {
     if (search) {
       return this._bookService.searchForBooks(search, offset, limit);
     }
