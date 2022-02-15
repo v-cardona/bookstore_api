@@ -1,6 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../user/user.entity";
 import { status } from '../../shared/entity-status.enum'
+import { Gender } from "../../shared/gender.enum";
 
 @Entity('books')
 export class Book extends BaseEntity {
@@ -21,7 +22,7 @@ export class Book extends BaseEntity {
     description: string;
 
     
-    @Column({type: 'tsvector', select: false})
+    @Column({type: 'tsvector', select: false, nullable: true})
     /**
      * Description of the book
      */
@@ -33,6 +34,17 @@ export class Book extends BaseEntity {
      * List of users with role author
      */
     authors: User[]
+
+    @Column({
+        type: "enum",
+        enum: Gender,
+        nullable: true,
+        array: true
+    })
+    /**
+     * List of genders of the book
+     */
+    genders: Gender[];
     
     @Column({type: 'varchar', default: status.ACTIVE, length: 8})
     status: string;

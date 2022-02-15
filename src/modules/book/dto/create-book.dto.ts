@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, IsArray, IsEnum, IsNotEmptyObject, MinLength, ArrayNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Gender } from '../../../shared/gender.enum';
 
 export class CreateBookDto {
   @IsNotEmpty()
@@ -18,4 +19,12 @@ export class CreateBookDto {
    * List of author user's id
    */
   readonly authors: number[];
+
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsEnum(Gender, { each: true })
+  /**
+   * List of genders of the book
+   */
+  readonly genders: Gender[]
 }

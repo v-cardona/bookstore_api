@@ -104,6 +104,7 @@ export class BookService {
         name: book.name,
         description: book.description,
         authors,
+        genders: book.genders
       });
 
       // actualizar el libro para crear el tsvector

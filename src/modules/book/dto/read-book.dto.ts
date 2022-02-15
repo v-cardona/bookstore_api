@@ -2,6 +2,7 @@ import { IsString, IsNumber, MaxLength } from 'class-validator';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { ReadUserDto } from '../../user/dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { Gender } from '../../../shared/gender.enum';
 
 
 @Exclude()
@@ -25,4 +26,8 @@ export class ReadBookDto {
   @Expose()
   @Type(type => ReadUserDto)
   readonly authors: ReadUserDto[];
+
+  
+  @Expose()
+  readonly genders: Gender[];
 }
