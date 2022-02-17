@@ -1,9 +1,10 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 import { Role } from '../role/role.entity';
 import { UserDetails } from './user.details.entity';
 import { status } from '../../shared/entity-status.enum';
 import { Book } from '../book/book.entity';
 import { PublicFile } from '../files/publicFile.entity';
+import { Review } from '../review/review.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -36,6 +37,10 @@ export class User extends BaseEntity {
      * List of books that the user is author
      */
     books: Book[];
+
+    
+    @OneToMany(() => Review, review => review.user)
+    reviews: Review[]
 
     @JoinColumn()
     @OneToOne(

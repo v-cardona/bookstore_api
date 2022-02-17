@@ -3,6 +3,7 @@ import { Exclude, Expose, Type } from 'class-transformer';
 import { ReadUserDto } from '../../user/dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '../../../shared/gender.enum';
+import { ReadReviewDto } from 'src/modules/review/dto/read-review.dto';
 
 
 @Exclude()
@@ -27,7 +28,10 @@ export class ReadBookDto {
   @Type(type => ReadUserDto)
   readonly authors: ReadUserDto[];
 
-  
+  @Expose()
+  @Type(type => ReadReviewDto)
+  readonly reviews: ReadReviewDto[]
+
   @Expose()
   readonly genders: Gender[];
 }

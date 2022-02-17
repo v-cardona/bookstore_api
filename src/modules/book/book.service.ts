@@ -14,6 +14,7 @@ import { UserIsNotAuthorException } from '../user/exception/userIsNotAuthor.exce
 import { UserNotFoundException } from '../user/exception/userNotFound.exception';
 import { IdMissingException } from 'src/shared/exception/idMissing.exception';
 import { Brackets, Connection, FindManyOptions, MoreThan } from 'typeorm';
+import { ReadReviewDto } from '../review/dto/read-review.dto';
 
 @Injectable()
 export class BookService {
@@ -191,6 +192,21 @@ export class BookService {
       }
 
       return plainToClass(ReadBooksSearchResultDto, result);
+  }
+
+  
+  async getReviews(bookId: number): Promise<ReadReviewDto[]> {
+    const bookExists = await this._bookRepository.findOne(bookId, {
+      where: { status: status.ACTIVE },
+      relations: ['reviews']
+    });
+
+    if (!bookExists) {
+      throw new BookNotFoundException(bookId);
+    }
+    
+    const reviews = bookExists.reviews.map((review) => plainToClass(ReadReviewDto, review));
+    return reviews;
   }
 
 }

@@ -1,7 +1,8 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../user/user.entity";
 import { status } from '../../shared/entity-status.enum'
 import { Gender } from "../../shared/gender.enum";
+import { Review } from "../review/review.entity";
 
 @Entity('books')
 export class Book extends BaseEntity {
@@ -45,6 +46,9 @@ export class Book extends BaseEntity {
      * List of genders of the book
      */
     genders: Gender[];
+    
+    @OneToMany(() => Review, review => review.book)
+    reviews: Review[]
     
     @Column({type: 'varchar', default: status.ACTIVE, length: 8})
     status: string;

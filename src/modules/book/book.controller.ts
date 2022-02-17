@@ -6,6 +6,7 @@ import { CreateBookDto, ReadBookDto, ReadBooksSearchResultDto, UpdateBookDto } f
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { VersioningEnum } from 'src/shared/versioning.enum';
 import { PaginationParams } from 'src/shared/paginationParams';
+import { ReadReviewDto } from '../review/dto/read-review.dto';
 
 @Controller({version: VersioningEnum.V1, path: 'book'})
 @ApiTags('Books')
@@ -106,4 +107,15 @@ export class BookController {
   deleteBook(@Param('bookId', ParseIntPipe) bookId: number): Promise<boolean> {
     return this._bookService.delete(bookId);
   }
+  
+  /**
+   * Get reviews of bookId
+   * @param bookId 
+   * @returns [ReadReviewDto]
+   */
+   @Get('/reviews/:bookId')
+   @ApiNotFoundResponse({description: 'The book with bookId does not exist'})
+   getReviewsOfBook(@Param('bookId', ParseIntPipe) bookId: number): Promise<ReadReviewDto[]> {
+     return this._bookService.getReviews(bookId);
+   }
 }
